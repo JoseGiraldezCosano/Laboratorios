@@ -1,4 +1,4 @@
-#Parte 1: Preguntas Teóricas
+# Parte 1: Preguntas Teóricas
 
 ## 1. ¿Qué es DevOps y por qué es importante en el contexto de la implementación y gestión de aplicaciones en contenedores como Kubernetes? 
 
