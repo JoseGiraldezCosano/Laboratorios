@@ -1,0 +1,7 @@
+---
+- name: Comprobamos que las conexiones están OK
+  hosts: all
+
+  tasks:
+  - name: Ping
+    ping:
