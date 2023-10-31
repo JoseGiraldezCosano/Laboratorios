@@ -1,0 +1,64 @@
+---
+- name: Instalar Kubernetes 1.28 en Ubuntu
+  hosts: all
+  become: yes
+  vars:
+    kubernetes_version: 1.28
+  tasks:
+    - name: Instalar los paquetes necesarios
+      apt:
+        name: ['apt-transport-https', 'ca-certificates', 'curl']
+        state: present
+      become: yes
+
+    - name: Crear directorio para almacenar las claves
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+      become: yes
+
+    - name: Descargar la clave pública de Kubernetes
+      get_url:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        dest: /tmp/apt-key.gpg
+      become: yes
+
+    - name: Obtener y almacenar claves públicas
+      command: >
+        gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg /tmp/apt-key.gpg
+      environment:
+        GNUPGHOME: /tmp
+      args:
+        creates: /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+      become: yes
+      register: gpg_output
+
+    - name: Crear directorio para los archivos de fuente de APT
+      file:
+        path: /etc/apt/sources.list.d
+        state: directory
+      become: yes
+
+    - name: Crear archivo kubernetes.list
+      file:
+        path: /etc/apt/sources.list.d/kubernetes.list
+        state: touch
+      become: yes
+
+    - name: Ubicar paquetes de Kubernetes
+      lineinfile:
+        path: /etc/apt/sources.list.d/kubernetes.list
+        line: deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+      become: yes
+
+    - name: Instalar kubelet, kubeadm y kubectl y actualizar caché
+      apt:
+        name: 
+          - 'kubelet=1.28.2-00'
+          - 'kubeadm=1.28.2-00'
+          - 'kubectl=1.28.2-00'
+        state: present
+        update_cache: yes
+      become: yes
+
